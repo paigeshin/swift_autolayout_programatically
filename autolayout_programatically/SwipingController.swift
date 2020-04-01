@@ -89,8 +89,6 @@ class SwipingController : UICollectionViewController, UICollectionViewDelegateFl
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         setUpBottomControls()
         //Programatically Register Cell
 //        collectionView?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "CellId")
@@ -125,8 +123,32 @@ class SwipingController : UICollectionViewController, UICollectionViewDelegateFl
     //Swiping Collection View, Essential Method
     override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         pageControl.currentPage = Int(targetContentOffset.pointee.x / view.frame.width)
+        print(targetContentOffset.pointee.x)
     }
     
+    //Paging 했을 시에 item에 중간으로 정렬이 되지 않는 경우 - `minimumLineSpacingForSectionAt`
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+
     
 }
 
+
+extension SwipingController {
+    //fix when in landscape mode
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        coordinator.animate(alongsideTransition: { (_) in
+            self.collectionViewLayout.invalidateLayout()
+            
+            if self.pageControl.currentPage == 0 {
+                self.collectionView.contentOffset = .zero
+            } else {
+                //Scroll To Correct Index
+                let indexPath: IndexPath = IndexPath(item: self.pageControl.currentPage, section: 0)
+                self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+            }
+
+        }, completion: nil)
+    }
+}

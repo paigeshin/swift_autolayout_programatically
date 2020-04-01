@@ -8,6 +8,11 @@
 
 import UIKit
 
+extension UIColor {
+    static var mainPink = UIColor(red: 232/255, green: 68/255, blue: 133/255, alpha: 1)
+    static var subMainPink = UIColor(red: 249/255, green: 207/255, blue: 224/255, alpha: 1)
+}
+
 class ViewController: UIViewController {
     
     // Let's avoid polluting viewDidLoad
@@ -23,51 +28,77 @@ class ViewController: UIViewController {
 
     let titleTextView: UITextView = {
         let textView = UITextView()
-        
         let attributedtext = NSMutableAttributedString(string: "Join us today in our fun and games!", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 18)])
         attributedtext.append(NSAttributedString(string: "\n\nAre you ready for loads and loads of fun? Don't wait any longer! We hope to see you in our stores soon.", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor.gray]))
         textView.attributedText = attributedtext
         
         //이 값을 false로 바꾸어야지 coding으로 레이아웃을 짤 수 있게 됨.
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.font = UIFont.boldSystemFont(ofSize: 18)
         textView.textAlignment = .center
         textView.isEditable = false
         textView.isScrollEnabled = false
         return textView
     }()
     
-    let buttonPref: UIButton = {
-        let button = UIButton()
+    let previousButton: UIButton = {
+        let button = UIButton(type: .system) //system으로 설정해야 기본적인 default animation이 들어가진다.
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("PREV", for: .normal)
-        button.setTitleColor(.gray, for: .normal)
-        button.backgroundColor = .white
-        button.sizeToFit()
+        button.setTitle("Prev", for: .normal)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
+        button.setTitleColor(.systemGray, for: .normal)
         return button
     }()
     
-    let buttonNext: UIButton = {
-        let button = UIButton()
+    let nextButton: UIButton = {
+        let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("NEXT", for: .normal)
-        button.titleLabel?.font = UIFont(name: "NEXT", size: 20)
-        button.setTitleColor(.red, for: .normal)
-        button.sizeToFit()
+        button.setTitle("Next", for: .normal)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
+        let pickColor: UIColor = UIColor.mainPink
+        button.setTitleColor(pickColor, for: .normal)
         return button
     }()
     
-//    let buttonNext: UIButton = {
-//
-//    }
+    //Page Control
+    private let pageControl: UIPageControl = {
+        let pc = UIPageControl()
+        pc.currentPage = 0
+        pc.numberOfPages = 4
+        pc.currentPageIndicatorTintColor = .red
+        pc.pageIndicatorTintColor = UIColor.subMainPink
+        return pc
+    }()
+    
+    
+    fileprivate func setUpBottomControls() {
+        view.addSubview(previousButton)
+        
+        let bottomControlsStackView = UIStackView(arrangedSubviews:[
+            previousButton, pageControl, nextButton
+        ])
+        
+        bottomControlsStackView.translatesAutoresizingMaskIntoConstraints = false
+        bottomControlsStackView.distribution = .fillEqually
+        bottomControlsStackView.axis = .horizontal //참고로 horizontal이 default임
+        
+        view.addSubview(bottomControlsStackView)
+        
+        NSLayoutConstraint.activate([
+            bottomControlsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bottomControlsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bottomControlsStackView.heightAnchor.constraint(equalToConstant: 50),
+            bottomControlsStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(logoImageView)
         view.addSubview(titleTextView)
-        view.addSubview(buttonPref)
-        view.addSubview(buttonNext)
+   
         setupLayout()
+        setUpBottomControls()
     }
     
     //코드로 auto layout 위치 지정해주기.
@@ -75,6 +106,7 @@ class ViewController: UIViewController {
         let topImageContainerView = UIView()
         topImageContainerView.backgroundColor = .white
         view.addSubview(topImageContainerView)
+        
         topImageContainerView.translatesAutoresizingMaskIntoConstraints = false
         topImageContainerView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         topImageContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -92,11 +124,6 @@ class ViewController: UIViewController {
         titleTextView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
         titleTextView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
         
-        buttonPref.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 50).isActive = true
-        buttonPref.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50).isActive = true
-        
-        buttonNext.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -50).isActive = true
-        buttonNext.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50).isActive = true
     }
     
 
